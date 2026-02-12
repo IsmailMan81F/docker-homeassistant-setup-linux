@@ -1,0 +1,88 @@
+HOME ASSISTANT DOCKER INSTALLATION COMMANDS
+
+Step 1: Update System
+sudo apt update && sudo apt upgrade -y
+
+Step 2: Install Docker
+sudo apt install -y docker.io
+
+Step 3: Start Docker Service
+sudo systemctl start docker
+
+Step 4: Enable Docker Auto-start
+sudo systemctl enable docker
+
+Step 5: Add User to Docker Group
+sudo usermod -aG docker $USER
+
+Step 6: Reboot System
+sudo reboot
+
+Step 7: Verify Docker
+docker --version
+
+Step 8: Create Home Assistant Folder
+mkdir -p ~/homeassistant
+
+Step 9: Pull Home Assistant Image (// create the class)
+docker pull ghcr.io/home-assistant/home-assistant:stable
+
+Step 10: Run Home Assistant Container (// make an object)
+docker run -d \
+  --name homeassistant \
+  --privileged \
+  --restart=unless-stopped \
+  -e TZ=Africa/Algiers \
+  -v ~/homeassistant:/config \
+  --network=host \
+  ghcr.io/home-assistant/home-assistant:stable
+
+Step 11: Check Container Status
+docker ps
+
+Step 12: View Logs
+docker logs -f homeassistant
+
+Step 13: Access Web Interface
+http://localhost:8123
+
+---
+
+USEFUL COMMANDS:
+
+Start Home Assistant
+docker start homeassistant
+
+Stop Home Assistant
+docker stop homeassistant
+
+Restart Home Assistant
+docker restart homeassistant
+
+Check Running Containers
+docker ps
+
+View Logs
+docker logs homeassistant
+
+View Live Logs
+docker logs -f homeassistant
+
+Stop Docker Service
+sudo systemctl stop docker
+
+Start Docker Service
+sudo systemctl start docker
+
+Update Home Assistant
+docker stop homeassistant
+docker rm homeassistant
+docker pull ghcr.io/home-assistant/home-assistant:stable
+docker run -d \
+  --name homeassistant \
+  --privileged \
+  --restart=unless-stopped \
+  -e TZ=Africa/Algiers \
+  -v ~/homeassistant:/config \
+  --network=host \
+  ghcr.io/home-assistant/home-assistant:stable
