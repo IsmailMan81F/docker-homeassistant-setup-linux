@@ -1,0 +1,17 @@
+# Start Home Assistant
+docker start homeassistant
+
+# Stop Home Assistant
+docker stop homeassistant
+
+# Restart Home Assistant
+docker restart homeassistant
+
+# Check if running
+docker ps
+
+# See logs (troubleshooting)
+docker logs homeassistant
+
+# See live logs (Ctrl+C to exit)
+docker logs -f homeassistant

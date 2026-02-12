@@ -1,0 +1,8 @@
+# Enable docker to run in the background each time you turn on the pc
+sudo systemctl enable docker
+
+# Stop docker and stop the automatic process
+sudo systemctl stop docker
+
+# Start docker but not always (only this session)
+sudo systemctl start docker
