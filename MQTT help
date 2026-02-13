@@ -1,0 +1,40 @@
+🟢 1️⃣ Start / Stop / Restart Mosquitto
+
+# Start Mosquitto
+sudo systemctl start mosquitto
+
+# Stop Mosquitto
+sudo systemctl stop mosquitto
+
+# Restart Mosquitto
+sudo systemctl restart mosquitto
+
+# Enable Mosquitto to start automatically on boot
+sudo systemctl enable mosquitto
+
+# Disable auto-start
+sudo systemctl disable mosquitto
+
+🟢 2️⃣ Check Mosquitto Status
+
+# Check if it’s running
+sudo systemctl status mosquitto
+
+# Quick check (active or inactive)
+systemctl is-active mosquitto
+
+🟢 3️⃣ Test MQTT (Publish / Subscribe)
+
+# Install client tools if not done
+sudo apt install mosquitto-clients
+
+# Subscribe (listen to a topic)
+mosquitto_sub -h localhost -t test/topic
+
+# Publish (send a message)
+mosquitto_pub -h localhost -t test/topic -m "hello bro"
+
+🟢 6️⃣ Optional: Kill Mosquitto Process Manually
+
+# Optional: Kill Mosquitto Process Manually
+sudo pkill mosquitto
