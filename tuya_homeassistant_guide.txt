@@ -1,0 +1,309 @@
+COMPLETE GUIDE: CONTROL TUYA DEVICES LOCALLY WITH HOME ASSISTANT ON KALI LINUX
+================================================================================
+
+PREREQUISITES:
+- Kali Linux with Docker installed
+- Home Assistant running in Docker
+- Tuya device on the same network
+- Tuya Smart or Smart Life app installed on your phone
+
+
+PART 1: GET TUYA DEVICE CREDENTIALS
+====================================
+
+Step 1: Create Tuya IoT Developer Account
+------------------------------------------
+1. Go to https://iot.tuya.com in your browser
+2. Sign up for a new developer account (use email and password)
+3. Login to the platform
+
+
+Step 2: Create Cloud Project
+-----------------------------
+1. Click on "Cloud" in the top menu
+2. Click "Create Cloud Project"
+3. Fill in the form:
+   - Project Name: HomeAssistant (or anything you want)
+   - Description: anything
+   - Industry: Smart Home
+   - Development Method: Smart Home
+   - Data Center: Choose closest to you (Europe, Americas, Asia, etc.)
+4. Click "Create"
+
+
+Step 3: Get API Credentials
+----------------------------
+After creating the project, you will see:
+- Access ID/Client ID (copy this)
+- Access Secret/Client Secret (copy this)
+
+
+Step 4: Enable Required APIs
+-----------------------------
+1. In your project, go to "Service API" tab
+2. Click "Go to Authorize"
+3. Enable these APIs:
+   - IoT Core
+   - Authorization
+   - Smart Home Scene Linkage
+4. Click "Authorize"
+
+
+Step 5: Link Your Tuya Smart App Account
+-----------------------------------------
+1. In your project, go to "Devices" tab
+2. Click "Link Tuya App Account"
+3. You'll get a QR code
+4. Open your Tuya Smart or Smart Life app on your phone
+5. Go to Me → Settings → QR Code Scanner (or similar)
+6. Scan the QR code from the IoT platform
+7. Your devices will now appear in the browser
+
+
+Step 6: Get Device ID and Local Key
+------------------------------------
+1. In the browser (iot.tuya.com), go to "Devices" tab
+2. Click on your Tuya device
+3. Copy and save:
+   - Device ID (example: bf65a01115d0dead2fbail)
+4. Go to the API Explorer
+5. Enter Query Device Details (or something similar)
+6. Put the Device ID in the field and click "Request"
+7. You'll find new credientials, choose :    
+   - Local Key (example: RsaLY2]O5^49yPOS)
+
+
+PART 2: FIND DEVICE IP ADDRESS
+===============================
+
+** The IP Address is found automaticly by LocalTuya integration (you'll do it later)
+
+
+PART 3: INSTALL HACS IN HOME ASSISTANT
+=======================================
+
+Step 1: Find Your Home Assistant Container
+-------------------------------------------
+docker ps
+
+Look for the container with Home Assistant. Note the container name (example: homeassistant)
+
+
+Step 2: Install HACS
+---------------------
+docker exec -it homeassistant /bin/bash
+wget -O - https://get.hacs.xyz | bash -
+exit
+
+
+Step 3: Restart Home Assistant
+-------------------------------
+docker restart homeassistant
+
+Wait 1 minute for restart.
+
+
+Step 4: Setup HACS in Home Assistant UI
+----------------------------------------
+1. Open Home Assistant in browser
+
+2. Go to Settings → Devices & Services
+
+3. Click "+ Add Integration" (bottom right)
+
+4. Search for "HACS"
+
+5. Click on HACS and follow the setup wizard:
+   - Authorize with your GitHub account
+   - Accept the terms and conditions
+   - Complete the setup
+
+6. You should now see HACS in the integrations list
+
+
+PART 4: INSTALL LOCALTUYA INTEGRATION
+======================================
+
+Step 1: Add LocalTuya Repository to HACS
+-----------------------------------------
+1. Click on "HACS" in the left sidebar
+
+2. Click "Integrations"
+
+3. Click the three dots (⋮) in top right corner
+
+4. Click "Custom repositories"
+
+5. Add this information:
+   - Repository: https://github.com/rospogrigio/localtuya
+   - Category: Integration
+
+6. Click "Add"
+
+
+Step 2: Download LocalTuya
+---------------------------
+1. In HACS → Integrations, click "Explore & Download Repositories" (bottom right)
+
+2. Search for "LocalTuya"
+
+3. Click on "LocalTuya integration"
+
+4. Click "Download"
+
+5. Click "Download" again to confirm
+
+
+Step 3: Restart Home Assistant
+-------------------------------
+docker restart homeassistant
+
+Wait 1 minute for restart.
+
+
+PART 5: CONFIGURE LOCALTUYA WITH YOUR DEVICE
+=============================================
+
+Step 1: Add LocalTuya Integration
+----------------------------------
+1. Go to Settings → Devices & Services
+
+2. Click "+ Add Integration" (bottom right)
+
+3. Search for "LocalTuya"
+
+4. Click on it
+
+
+Step 2: Add Your Device
+------------------------
+1. Click "Add a new device"
+
+2. Enter your device information:
+   - Name: YOUR_APP_NAME (example: switch)
+   - Host: YOUR_DEVICE_IP (example: 10.133.191.78)
+   - Device ID: YOUR_DEVICE_ID (example: bf65a01115d0dead2fbail)
+   - Local Key: YOUR_LOCAL_KEY (example: RsaLY2]O5^49yPOS)
+   - Protocol Version: 3.4 (or 3.3 if that's what TinyTuya showed)
+
+3. Click "Submit"
+
+4. Choose your device type (Switch, Light, Plug, etc.)
+
+5. Configure the entity:
+   - Give it a name (example: "Living Room Switch")
+   - Configure DPs (Data Points) - usually DP 1 is the main switch
+
+6. Click "Submit"
+
+
+Step 3: Test Your Device
+-------------------------
+1. Go to Overview (Home Assistant dashboard)
+
+2. You should see your device card
+
+3. Click the toggle to turn it on/off
+
+4. Your Tuya device should respond!
+
+
+TROUBLESHOOTING
+===============
+
+Problem: Device not responding
+-------------------------------
+Solution 1: Check protocol version
+- Try changing between 3.3 and 3.4 in LocalTuya settings
+- Delete the device and re-add it with different protocol version
+
+Solution 2: Verify IP address
+- Device IP might have changed
+- Run: python3 -m tinytuya scan
+- Update the IP in LocalTuya settings
+
+Solution 3: Check Local Key
+- If you re-paired the device in Tuya app, the local key changes
+- Go back to iot.tuya.com and get the new local key
+- Update in LocalTuya settings
+
+
+Problem: Can't find device IP
+------------------------------
+Solution:
+- Make sure device is powered on and connected to WiFi
+- Make sure Kali and device are on same network
+- Check router's connected devices list
+- Use: python3 -m tinytuya scan
+
+
+Problem: LocalTuya not showing in integrations
+-----------------------------------------------
+Solution:
+- Make sure HACS is installed properly
+- Clear browser cache
+- Restart Home Assistant: docker restart homeassistant
+
+
+SUMMARY OF WHAT YOU NEED
+=========================
+
+From Tuya IoT Platform (iot.tuya.com):
+- Device ID
+- Local Key
+
+From Network Scan:
+- Device IP Address
+- Protocol Version (usually 3.3 or 3.4)
+
+Installed in Home Assistant:
+- HACS
+- LocalTuya integration (via HACS)
+
+
+IMPORTANT NOTES
+===============
+
+1. All control is LOCAL - no cloud needed after setup
+   Once configured, Home Assistant talks directly to your Tuya device on your local network
+
+2. Static IP recommended
+   Set a static IP or DHCP reservation for your Tuya device in your router to prevent IP changes
+
+3. Local Key changes
+   If you remove and re-add the device in Tuya Smart app, you need to get the new local key from iot.tuya.com
+
+4. Network requirement
+   Kali machine and Tuya device MUST be on the same network
+
+5. Firewall
+   Make sure your Kali firewall isn't blocking local network communication
+
+
+COMMANDS SUMMARY
+================
+
+Install TinyTuya:
+pip3 install tinytuya --break-system-packages
+
+Scan for Tuya devices:
+python3 -m tinytuya scan
+
+Check Docker containers:
+docker ps
+
+Enter Home Assistant container:
+docker exec -it homeassistant /bin/bash
+
+Install HACS:
+wget -O - https://get.hacs.xyz | bash -
+
+Restart Home Assistant:
+docker restart homeassistant
+
+Check logs:
+docker exec -it homeassistant cat home-assistant.log | tail -50
+
+
+END OF GUIDE
+============
